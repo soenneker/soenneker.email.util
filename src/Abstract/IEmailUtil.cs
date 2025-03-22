@@ -1,4 +1,5 @@
 ﻿using Soenneker.Messages.Base;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Soenneker.Email.Util.Abstract;
@@ -8,5 +9,5 @@ namespace Soenneker.Email.Util.Abstract;
 /// </summary>
 public interface IEmailUtil
 {
-    ValueTask PlaceOnQueue<T>(T msgModel) where T : Message;
+    ValueTask PlaceOnQueue<T>(T msgModel, CancellationToken cancellationToken = default) where T : Message;
 }
