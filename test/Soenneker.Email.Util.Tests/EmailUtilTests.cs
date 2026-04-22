@@ -1,20 +1,19 @@
-﻿using Soenneker.Email.Util.Abstract;
-using Soenneker.Tests.FixturedUnit;
-using Xunit;
+using Soenneker.Email.Util.Abstract;
+using Soenneker.Tests.HostedUnit;
 
 namespace Soenneker.Email.Util.Tests;
 
-[Collection("Collection")]
-public class EmailUtilTests : FixturedUnitTest
+[ClassDataSource<Host>(Shared = SharedType.PerTestSession)]
+public class EmailUtilTests : HostedUnitTest
 {
     private readonly IEmailUtil _util;
 
-    public EmailUtilTests(Fixture fixture, ITestOutputHelper output) : base(fixture, output)
+    public EmailUtilTests(Host host) : base(host)
     {
         _util = Resolve<IEmailUtil>(true);
     }
 
-    [Fact]
+    [Test]
     public void Default()
     {
 
