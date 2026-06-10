@@ -44,6 +44,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Soenneker.ServiceBus.Transmitter" Version="4.0.3719" />
+        <PackageReference Include="Soenneker.ServiceBus.Transmitter" Version="4.0.3721" />
     </ItemGroup>
 </Project>
