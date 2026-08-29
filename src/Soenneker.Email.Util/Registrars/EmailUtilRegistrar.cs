@@ -13,6 +13,8 @@ public static class EmailUtilRegistrar
     /// <summary>
     /// Adds <see cref="IEmailUtil"/> as a singleton service. <para/>
     /// </summary>
+    /// <param name="services">Service collection that receives the registration.</param>
+    /// <returns>The same service collection, so additional registrations can be chained.</returns>
     public static IServiceCollection AddEmailUtilAsSingleton(this IServiceCollection services)
     {
         services.AddServiceBusTransmitterAsSingleton().TryAddSingleton<IEmailUtil, EmailUtil>();
@@ -23,6 +25,8 @@ public static class EmailUtilRegistrar
     /// <summary>
     /// Adds <see cref="IEmailUtil"/> as a scoped service. <para/>
     /// </summary>
+    /// <param name="services">Service collection that receives the registration.</param>
+    /// <returns>The same service collection, so additional registrations can be chained.</returns>
     public static IServiceCollection AddEmailUtilAsScoped(this IServiceCollection services)
     {
         services.AddServiceBusTransmitterAsScoped().TryAddScoped<IEmailUtil, EmailUtil>();
