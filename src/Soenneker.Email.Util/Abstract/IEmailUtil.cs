@@ -5,16 +5,16 @@ using System.Threading.Tasks;
 namespace Soenneker.Email.Util.Abstract;
 
 /// <summary>
-/// A utility to place emails on Service Bus
+/// Queues message envelopes for transmission to Azure Service Bus.
 /// </summary>
 public interface IEmailUtil
 {
     /// <summary>
-    /// Places on Queue.
+    /// Places a message on the transmitter's in-process background queue for later delivery to Azure Service Bus.
     /// </summary>
-    /// <typeparam name="T">Type of value handled by the email.</typeparam>
-    /// <param name="msgModel">Msg Model for the place on queue operation.</param>
+    /// <typeparam name="T">Message envelope type.</typeparam>
+    /// <param name="msgModel">Message to queue.</param>
     /// <param name="cancellationToken">Token used to cancel the operation.</param>
-    /// <returns>A task that completes when the place on queue operation is complete.</returns>
+    /// <returns>A task that completes when the background queue accepts the work item.</returns>
     ValueTask PlaceOnQueue<T>(T msgModel, CancellationToken cancellationToken = default) where T : Message;
 }

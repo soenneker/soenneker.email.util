@@ -5,7 +5,7 @@
 
 # Soenneker.Email.Util
 
-A utility to place emails on Service Bus.
+Queues an `EmailMessage`—or another `Message` envelope—for asynchronous transmission to Azure Service Bus through `IServiceBusTransmitter`.
 
 ## Install
 
@@ -13,31 +13,64 @@ A utility to place emails on Service Bus.
 dotnet add package Soenneker.Email.Util
 ```
 
-## Quick start
+## Configuration
+
+```json
+{
+  "Azure": {
+    "ServiceBus": {
+      "Enable": true,
+      "ConnectionString": "use-a-secret-provider",
+      "TransmitterLogging": false
+    }
+  }
+}
+```
+
+`Enable` and `ConnectionString` are required by the registered Service Bus components. Keep the connection string in a secret provider. `TransmitterLogging` is optional and should remain false when message bodies may contain personal or confidential data.
+
+## Registration
 
 ```csharp
 using Soenneker.Email.Util.Registrars;
-using Microsoft.Extensions.DependencyInjection;
 
-var services = new ServiceCollection();
-var result = services.AddEmailUtilAsSingleton();
+services.AddEmailUtilAsSingleton();
 ```
 
-Adds `IEmailUtil` as a singleton service.
+For a scoped wrapper:
 
-## What you get
+```csharp
+services.AddEmailUtilAsScoped();
+```
 
-- `IEmailUtil` — A utility to place emails on Service Bus.
-- `EmailUtilRegistrar` — A utility to place emails on Service Bus.
+The scoped registration creates `IEmailUtil` and its transmitter per scope while intentionally retaining the background queue, message utility, sender utility, and underlying Service Bus client as shared singleton infrastructure. Ending a scope therefore disposes the wrapper without tearing down and recreating the shared client.
 
-## API at a glance
+## Queue an email
 
-| API | What it does | Result / important behavior |
-| --- | --- | --- |
-| `IEmailUtil.PlaceOnQueue(msgModel, cancellationToken)` | Places on Queue. | A task that completes when the place on queue operation is complete. |
-| `EmailUtilRegistrar.AddEmailUtilAsSingleton(services)` | Adds `IEmailUtil` as a singleton service. | The same service collection, so additional registrations can be chained. |
-| `EmailUtilRegistrar.AddEmailUtilAsScoped(services)` | Adds `IEmailUtil` as a scoped service. | The same service collection, so additional registrations can be chained. |
+```csharp
+using Soenneker.Email.Util.Abstract;
+using Soenneker.Enums.Email.Format;
+using Soenneker.Enums.Email.Priority;
+using Soenneker.Messages.Email;
 
-## Practical notes
+var message = new EmailMessage
+{
+    Type = "email.receipt.v1",
+    Id = Guid.NewGuid().ToString("N"),
+    Queue = "email",
+    Sender = "orders-api",
+    CreatedAt = DateTimeOffset.UtcNow,
+    To = ["recipient@example.net"],
+    Subject = "Your receipt",
+    Format = EmailFormat.Html,
+    Priority = EmailPriority.Normal,
+    ContentFileName = "receipt.html"
+};
 
-- Cancellation stops pending work; it does not undo work that has already completed.
+IEmailUtil email = serviceProvider.GetRequiredService<IEmailUtil>();
+await email.PlaceOnQueue(message, cancellationToken);
+```
+
+`PlaceOnQueue` uses the transmitter's in-process background queue. Completion means that queue accepted the work item; it does not mean Azure Service Bus accepted the message or that an email was delivered. Transmission failures are handled and logged by the transmitter.
+
+When Service Bus is disabled, the transmitter logs a warning and skips the message. Cancellation can stop work that has not completed, but it cannot retract a message already sent to Service Bus.
