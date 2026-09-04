@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Soenneker.Email.Util;
 
+/// <inheritdoc cref="IEmailUtil" />
 public sealed class EmailUtil : IEmailUtil
 {
     private readonly IServiceBusTransmitter _serviceBusTransmitter;
