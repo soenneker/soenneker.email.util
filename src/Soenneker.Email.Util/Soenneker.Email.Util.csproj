@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net11.0</TargetFramework>
+        <Features Condition="'$(TargetFramework)' == 'net11.0'">$(Features);runtime-async=on</Features>
         <IsAotCompatible>true</IsAotCompatible>
         <Nullable>enable</Nullable>
         <Platforms>AnyCPU</Platforms>
@@ -45,7 +46,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Soenneker.ServiceBus.Transmitter" Version="11.0.4012" />
+        <PackageReference Include="Soenneker.ServiceBus.Transmitter" Version="11.0.4013" />
     </ItemGroup>
     <ItemGroup>
     </ItemGroup>
